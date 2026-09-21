@@ -34,7 +34,7 @@ async function refreshLogCount() {
     .select("id", { count: "exact", head: true });
   logCountNoteEl.textContent = error
     ? `완료 기록 수를 불러오지 못했습니다: ${error.message}`
-    : `완료 기록: ${count ?? 0}건 (연달아 두 번 눌러도 이 숫자는 한 번만 늘어나야 합니다)`;
+    : `완료 기록(누적): ${count ?? 0}건 — 되돌려도 줄지 않습니다. 실제로 있었던 일은 기록에 남습니다. (연달아 두 번 눌러도 이 숫자는 한 번만 늘어나야 합니다)`;
 }
 
 // ---------- 완료 대기 목록 ----------

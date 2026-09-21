@@ -234,10 +234,11 @@ async function createPlan(values) {
 async function updatePlanWithHistory(planId, newValues) {
   // 1) 수정 "직전" 값을 이력에 먼저 쌓는다 (plan_id는 그대로, version_no만 증가)
   const before = planCache[planId];
-  const { count } = await supabaseClient
+  const { count, error: countErr } = await supabaseClient
     .from("plan_history")
     .select("history_id", { count: "exact", head: true })
     .eq("plan_id", planId);
+  if (countErr) throw countErr;
   const nextVersion = (count ?? 0) + 1;
 
   const { error: histErr } = await supabaseClient.from("plan_history").insert({
