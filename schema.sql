@@ -135,3 +135,60 @@ create policy "anon_select_execution_logs" on execution_logs
 drop policy if exists "anon_insert_execution_logs" on execution_logs;
 create policy "anon_insert_execution_logs" on execution_logs
   for insert to anon with check (true);
+
+-- ============================================================
+-- 카드 4 — 돌아보기, 그리고 다음 계획으로
+-- plan_reviews: 돌아보기에서 정한 "고칠 점 한 줄". carried_to_plan_id가
+-- null이면 아직 다음 계획에 안 붙은 상태. 새 계획이 만들어질 때
+-- 가장 최근의 미부착 메모 1건을 그 새 계획에 붙이고(carried_to_plan_id
+-- 채움), 새 계획의 carried_note에도 문구를 복사해서 눈에 보이게 한다.
+-- ============================================================
+alter table plans add column if not exists carried_note text;
+
+create table if not exists plan_reviews (
+  id uuid primary key default gen_random_uuid(),
+  plan_id uuid not null references plans(id) on delete cascade,
+  improvement_note text not null,
+  carried_to_plan_id uuid references plans(id),
+  created_at timestamptz not null default now()
+);
+
+alter table plan_reviews enable row level security;
+
+grant select, insert, update on public.plan_reviews to anon, authenticated;
+
+drop policy if exists "anon_select_plan_reviews" on plan_reviews;
+create policy "anon_select_plan_reviews" on plan_reviews
+  for select to anon using (true);
+drop policy if exists "anon_insert_plan_reviews" on plan_reviews;
+create policy "anon_insert_plan_reviews" on plan_reviews
+  for insert to anon with check (true);
+drop policy if exists "anon_update_plan_reviews" on plan_reviews;
+create policy "anon_update_plan_reviews" on plan_reviews
+  for update to anon using (true) with check (true);
+
+-- ============================================================
+-- 카드 4 — 돌아보기 (reviews) + 계획에 "넘어온 메모" 컬럼
+-- reviews.note 한 건이 다음에 만드는 계획의 plans.carried_note로
+-- 복사되어 들어간다. 그래야 "다음 계획으로 넘어간다"는 게 화면 문구가
+-- 아니라 실제 새 계획 레코드에 남는 값이 된다.
+-- ============================================================
+alter table plans add column if not exists carried_note text;
+
+create table if not exists reviews (
+  id uuid primary key default gen_random_uuid(),
+  plan_id uuid references plans(id) on delete set null,
+  note text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table reviews enable row level security;
+
+grant select, insert on public.reviews to anon, authenticated;
+
+drop policy if exists "anon_select_reviews" on reviews;
+create policy "anon_select_reviews" on reviews
+  for select to anon using (true);
+drop policy if exists "anon_insert_reviews" on reviews;
+create policy "anon_insert_reviews" on reviews
+  for insert to anon with check (true);

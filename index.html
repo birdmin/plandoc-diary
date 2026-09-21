@@ -20,7 +20,7 @@
       <div class="tab active" data-tab="plan">계획</div>
       <div class="tab" data-tab="todo">세부 계획</div>
       <div class="tab" data-tab="log">실행 기록</div>
-      <div class="tab disabled">돌아보기</div>
+      <div class="tab" data-tab="review">돌아보기</div>
     </nav>
 
     <div class="notice">
@@ -186,6 +186,17 @@
         <div class="empty">불러오는 중…</div>
       </div>
     </div>
+
+    <!-- ===================== 탭: 돌아보기 ===================== -->
+    <div class="tab-panel" id="tab-review" hidden>
+      <div class="notice" style="background:var(--paper-alt); border-color:var(--line); color:var(--ink-soft);">
+        계획별로 예상과 실제의 차이를 보여줍니다. 숫자를 누르면 그 숫자가 나온 기록이 아래 펼쳐집니다.
+        각 카드 아래에서 "고칠 점 한 줄"을 적어두면, 다음에 새 계획을 만들 때 그 계획에 자동으로 붙습니다.
+      </div>
+      <div class="review-list" id="review-list">
+        <div class="empty">불러오는 중…</div>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -193,11 +204,18 @@
   <script src="app.js"></script>
   <script src="todo.js"></script>
   <script src="log.js"></script>
+  <script src="review.js"></script>
   <script>
     document.getElementById("today-label").textContent =
       new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
 
-    // 탭 전환 (비활성 탭은 무시)
+    // 탭 전환 (비활성 탭은 무시) + 전환될 때마다 그 탭 데이터 새로고침
+    const tabRefresh = {
+      plan: () => loadPlans(),
+      todo: () => loadTodos(),
+      log: () => { loadPendingTodos(); loadDoneTodos(); refreshLogCount(); },
+      review: () => loadReview(),
+    };
     document.querySelectorAll(".tab[data-tab]").forEach((tabEl) => {
       tabEl.addEventListener("click", () => {
         if (tabEl.classList.contains("disabled")) return;
@@ -205,6 +223,8 @@
         document.querySelectorAll(".tab-panel").forEach((p) => (p.hidden = true));
         tabEl.classList.add("active");
         document.getElementById(`tab-${tabEl.dataset.tab}`).hidden = false;
+        const refresh = tabRefresh[tabEl.dataset.tab];
+        if (refresh) refresh();
       });
     });
   </script>

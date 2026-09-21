@@ -104,6 +104,9 @@ async function loadPlans() {
 }
 
 function renderPlanRow(p) {
+  const carriedHtml = p.carried_note
+    ? `<div class="carried-note">↳ 이전 계획에서 넘어온 개선점: ${escapeHtml(p.carried_note)}</div>`
+    : "";
   return `
     <div class="plan-row priority-${p.priority}" data-plan-id="${p.id}">
       <div class="plan-top">
@@ -117,6 +120,7 @@ function renderPlanRow(p) {
           · ${fmtDate(p.period_start)} ~ ${fmtDate(p.period_end)}
         </div>
       </div>
+      ${carriedHtml}
       <dl class="plan-detail">
         <dt>성공 기준</dt>
         <dd>${escapeHtml(p.success_criteria)}</dd>
@@ -227,8 +231,32 @@ form.addEventListener("submit", async (e) => {
 async function createPlan(values) {
   // plans 테이블에 최초 상태로 생성. 이 시점 값은 plans 자체가 최초 기록이므로
   // plan_history에는 아직 넣지 않는다 (이력은 "수정이 일어날 때" 쌓인다).
-  const { error } = await supabaseClient.from("plans").insert(values);
+  const { data, error } = await supabaseClient.from("plans").insert(values).select().single();
   if (error) throw error;
+
+  // 돌아보기에서 아직 다음 계획에 안 붙은 "고칠 점" 메모가 있으면,
+  // 가장 최근 것 1건을 이 새 계획에 자동으로 이어붙인다.
+  const { data: pending, error: pendingErr } = await supabaseClient
+    .from("plan_reviews")
+    .select("*")
+    .is("carried_to_plan_id", null)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (pendingErr) throw pendingErr;
+
+  if (pending && pending.length) {
+    const note = pending[0];
+    const { error: carryErr } = await supabaseClient
+      .from("plans")
+      .update({ carried_note: note.improvement_note })
+      .eq("id", data.id);
+    if (carryErr) throw carryErr;
+    const { error: markErr } = await supabaseClient
+      .from("plan_reviews")
+      .update({ carried_to_plan_id: data.id })
+      .eq("id", note.id);
+    if (markErr) throw markErr;
+  }
 }
 
 async function updatePlanWithHistory(planId, newValues) {
