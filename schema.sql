@@ -102,3 +102,36 @@ create policy "anon_update_todos" on todos
 drop policy if exists "anon_delete_todos" on todos;
 create policy "anon_delete_todos" on todos
   for delete to anon using (true);
+
+-- ============================================================
+-- 카드 3 — 실행 기록 (execution_logs)
+-- 할 일(todos) 하나에 여러 건 붙을 수 있다 (여러 번 시도 가능).
+-- "완료" 처리는 이 표에 기록 1건을 남기는 것과 짝지어지는데,
+-- 완료 버튼을 연달아 두 번 눌러도 기록이 중복되면 안 된다.
+-- → idempotency_key: 완료 폼을 "여는 순간" 클라이언트에서 한 번만
+--   만들어서 그 폼에 고정해두는 값. 두 번 저장을 시도해도 같은 키가
+--   전송되므로, 아래 unique 제약이 두 번째 시도를 DB 레벨에서 막는다.
+--   (버튼 비활성화만으로는 네트워크 지연·중복 클릭 상황을 못 막는다.)
+-- ============================================================
+create table if not exists execution_logs (
+  id uuid primary key default gen_random_uuid(),
+  todo_id uuid not null references todos(id) on delete cascade,
+  started_at timestamptz not null,
+  ended_at timestamptz not null,
+  actual_minutes numeric not null check (actual_minutes >= 0),
+  blocker_reason text,
+  idempotency_key uuid not null unique,
+  created_at timestamptz not null default now(),
+  check (ended_at >= started_at)
+);
+
+alter table execution_logs enable row level security;
+
+grant select, insert on public.execution_logs to anon, authenticated;
+
+drop policy if exists "anon_select_execution_logs" on execution_logs;
+create policy "anon_select_execution_logs" on execution_logs
+  for select to anon using (true);
+drop policy if exists "anon_insert_execution_logs" on execution_logs;
+create policy "anon_insert_execution_logs" on execution_logs
+  for insert to anon with check (true);

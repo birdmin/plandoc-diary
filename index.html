@@ -19,7 +19,7 @@
     <nav class="tabs">
       <div class="tab active" data-tab="plan">계획</div>
       <div class="tab" data-tab="todo">세부 계획</div>
-      <div class="tab disabled">실행 기록</div>
+      <div class="tab" data-tab="log">실행 기록</div>
       <div class="tab disabled">돌아보기</div>
     </nav>
 
@@ -166,12 +166,33 @@
         <div class="empty">불러오는 중…</div>
       </div>
     </div>
+
+    <!-- ===================== 탭: 실행 기록 ===================== -->
+    <div class="tab-panel" id="tab-log" hidden>
+      <div class="notice" style="background:var(--paper-alt); border-color:var(--line); color:var(--ink-soft);">
+        실행 기록은 계획(Plan) 값을 전혀 건드리지 않습니다. 여기서 저장해도 "계획" 탭의 값은 그대로입니다.
+        완료 버튼을 연달아 눌러도 아래 <strong>완료 기록 수</strong>는 한 번만 늘어나는지 확인해보세요.
+      </div>
+
+      <p class="sort-note" id="log-count-note">완료 기록: 불러오는 중…</p>
+
+      <h2 class="section-title">완료 처리 대기 중인 할 일</h2>
+      <div class="todo-list" id="pending-todo-list">
+        <div class="empty">불러오는 중…</div>
+      </div>
+
+      <h2 class="section-title">완료된 할 일 · 붙어 있는 실행 기록</h2>
+      <div class="todo-list" id="done-todo-list">
+        <div class="empty">불러오는 중…</div>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
   <script src="todo.js"></script>
+  <script src="log.js"></script>
   <script>
     document.getElementById("today-label").textContent =
       new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
