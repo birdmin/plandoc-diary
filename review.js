@@ -98,16 +98,16 @@ function renderReviewCard(plan, todos, today) {
           <button class="stat-value" onclick="toggleDetail('${plan.id}','done')">${totalTodos.length ? Math.round((completed.length / totalTodos.length) * 100) : 0}%</button>
         </div>
         <div class="stat-box">
+          <div class="stat-label">예상 시간</div>
+          <button class="stat-value" onclick="toggleDetail('${plan.id}','time')">${fmtH(estimatedSum)}h</button>
+        </div>
+        <div class="stat-box">
           <div class="stat-label">지연 수</div>
           <button class="stat-value" onclick="toggleDetail('${plan.id}','overdue')">${overdue.length}</button>
         </div>
         <div class="stat-box">
           <div class="stat-label">막힘 수</div>
           <button class="stat-value" onclick="toggleDetail('${plan.id}','blocked')">${blocked.length}</button>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">예상 시간</div>
-          <button class="stat-value" onclick="toggleDetail('${plan.id}','time')">${fmtH(estimatedSum)}h</button>
         </div>
         <div class="stat-box">
           <div class="stat-label">실제 시간</div>
