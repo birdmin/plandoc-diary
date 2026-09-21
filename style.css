@@ -1,0 +1,355 @@
+/* ==========================================================
+   플랜두씨 다이어리 — 디자인 토큰
+   콘셉트: 시험/공부 기록을 다루는 장부(ledger) 느낌.
+   흔한 크림+테라코타 조합 대신 잉크 남색 + 인디고 액센트.
+   ========================================================== */
+:root {
+  --paper: #EEF1F4;
+  --paper-alt: #E3E8EF;
+  --card: #FFFFFF;
+  --ink: #1F232B;
+  --ink-soft: #565E6C;
+  --line: #C7CEDA;
+  --accent: #2E4374;
+  --accent-soft: #DCE3F0;
+  --accent-ink: #16223F;
+  --priority-high: #A83E3E;
+  --priority-high-bg: #F5E4E2;
+  --priority-mid: #93701C;
+  --priority-mid-bg: #F3EBD6;
+  --priority-low: #3F7D57;
+  --priority-low-bg: #E1EEE4;
+  --danger: #A83E3E;
+  --radius: 10px;
+  --font-display: "Newsreader", Georgia, serif;
+  --font-body: "IBM Plex Sans", "Noto Sans KR", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.55;
+}
+
+body {
+  min-height: 100vh;
+}
+
+a { color: var(--accent); }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+}
+
+/* ---------- 헤더 & 탭 ---------- */
+.app-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.app-header h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.7rem;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.app-header .today {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+  gap: 2px;
+}
+
+.tab {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  cursor: default;
+  position: relative;
+  top: 1px;
+}
+
+.tab.active {
+  color: var(--ink);
+  background: var(--card);
+  border-color: var(--line);
+  font-weight: 600;
+}
+
+.tab.disabled {
+  color: #9AA2AF;
+}
+
+.tab.disabled::after {
+  content: "준비 중";
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  padding: 1px 6px;
+  border-radius: 100px;
+  background: var(--paper-alt);
+  color: var(--ink-soft);
+  vertical-align: middle;
+}
+
+/* ---------- 안내 배너 ---------- */
+.notice {
+  background: var(--accent-soft);
+  border: 1px solid #B9C6DE;
+  color: var(--accent-ink);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  margin-bottom: 24px;
+}
+
+.notice strong { font-weight: 700; }
+
+/* ---------- 폼 카드 ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.card + .card { margin-top: 20px; }
+
+.card h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 0 0 16px;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+
+.field label {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.field input,
+.field select,
+.field textarea {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  background: #fff;
+}
+
+.field textarea { resize: vertical; min-height: 56px; }
+
+.form-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+button {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 9px 16px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-primary:hover { background: var(--accent-ink); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+.btn-ghost:hover { background: var(--paper-alt); }
+
+.btn-small {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.form-status {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.form-status.error { color: var(--danger); }
+
+/* ---------- 계획 목록 (장부 느낌) ---------- */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 28px 0 12px;
+}
+
+.plan-list { display: flex; flex-direction: column; gap: 14px; }
+
+.plan-row {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.plan-row.priority-상 { border-left-color: var(--priority-high); }
+.plan-row.priority-중 { border-left-color: var(--priority-mid); }
+.plan-row.priority-하 { border-left-color: var(--priority-low); }
+
+.plan-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.plan-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 100px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.badge.priority-상 { background: var(--priority-high-bg); color: var(--priority-high); }
+.badge.priority-중 { background: var(--priority-mid-bg); color: var(--priority-mid); }
+.badge.priority-하 { background: var(--priority-low-bg); color: var(--priority-low); }
+
+.badge.version {
+  background: var(--paper-alt);
+  color: var(--ink-soft);
+}
+
+.plan-meta {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+
+.plan-meta .dday {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.plan-detail {
+  margin-top: 10px;
+  font-size: 0.92rem;
+}
+
+.plan-detail dt {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-top: 8px;
+}
+.plan-detail dd { margin: 2px 0 0; }
+
+.plan-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- 이력 타임라인 ---------- */
+.history-panel {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  display: none;
+}
+.history-panel.open { display: block; }
+
+.history-item {
+  position: relative;
+  padding: 8px 0 8px 18px;
+  border-left: 2px solid var(--line);
+  margin-left: 4px;
+  font-size: 0.85rem;
+}
+.history-item::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.history-item .h-head {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  margin-bottom: 3px;
+}
+.history-item.current .h-head { color: var(--accent-ink); font-weight: 600; }
+
+.empty {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  padding: 20px 0;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+}

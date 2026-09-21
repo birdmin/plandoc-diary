@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>플랜두씨 다이어리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <h1>플랜두씨 다이어리</h1>
+      <span class="today" id="today-label"></span>
+    </header>
+
+    <nav class="tabs">
+      <div class="tab active">계획</div>
+      <div class="tab disabled">실행 기록</div>
+      <div class="tab disabled">돌아보기</div>
+    </nav>
+
+    <div class="notice">
+      <strong>아직 로그인이 없습니다.</strong> 이 링크를 아는 사람은 누구나 이 화면을 보고,
+      계획을 추가·수정할 수 있습니다. 그래서 여기에는 남이 봐도 괜찮은 내용만 넣어주세요.
+      로그인으로 잠그는 작업은 다음 단계에서 진행합니다.
+    </div>
+
+    <section class="card">
+      <h2 id="form-title">새 계획 추가</h2>
+      <form id="plan-form">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="f-title">계획 제목</label>
+            <input id="f-title" type="text" placeholder="예: ADSP 필기 준비" required />
+          </div>
+          <div class="field">
+            <label for="f-start">기간 시작</label>
+            <input id="f-start" type="date" required />
+          </div>
+          <div class="field">
+            <label for="f-end">기간 종료</label>
+            <input id="f-end" type="date" required />
+          </div>
+          <div class="field">
+            <label for="f-priority">우선순위</label>
+            <select id="f-priority">
+              <option value="상">상</option>
+              <option value="중" selected>중</option>
+              <option value="하">하</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-hours">예상 시간 (하루 몇 시간)</label>
+            <input id="f-hours" type="number" min="0.5" step="0.5" placeholder="예: 2" required />
+          </div>
+          <div class="field full">
+            <label for="f-success">성공 기준</label>
+            <textarea id="f-success" placeholder="예: 절대평가 기준 60점 이상" required></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">저장</button>
+          <button type="button" id="cancel-edit" class="btn-ghost" hidden>수정 취소</button>
+          <span class="form-status" id="form-status"></span>
+        </div>
+      </form>
+    </section>
+
+    <h2 class="section-title">내 계획</h2>
+    <div class="plan-list" id="plan-list">
+      <div class="empty">불러오는 중…</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("today-label").textContent =
+      new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
+  </script>
+</body>
+</html>
