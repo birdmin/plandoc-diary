@@ -17,70 +17,174 @@
     </header>
 
     <nav class="tabs">
-      <div class="tab active">계획</div>
-      <div class="tab disabled">실행 기록</div>
+      <div class="tab active" data-tab="plan">계획</div>
+      <div class="tab" data-tab="todo">실행 기록</div>
       <div class="tab disabled">돌아보기</div>
     </nav>
 
     <div class="notice">
       <strong>아직 로그인이 없습니다.</strong> 이 링크를 아는 사람은 누구나 이 화면을 보고,
-      계획을 추가·수정할 수 있습니다. 그래서 여기에는 남이 봐도 괜찮은 내용만 넣어주세요.
+      계획·할 일을 추가·수정할 수 있습니다. 그래서 여기에는 남이 봐도 괜찮은 내용만 넣어주세요.
       로그인으로 잠그는 작업은 아직 구현되지 않았습니다.
     </div>
 
-    <section class="card">
-      <h2 id="form-title">새 계획 추가</h2>
-      <form id="plan-form">
+    <!-- ===================== 탭: 계획 ===================== -->
+    <div class="tab-panel active" id="tab-plan">
+      <section class="card">
+        <h2 id="form-title">새 계획 추가</h2>
+        <form id="plan-form">
+          <div class="form-grid">
+            <div class="field full">
+              <label for="f-title">계획 제목</label>
+              <input id="f-title" type="text" placeholder="예: ADSP 필기 준비" required />
+            </div>
+            <div class="field">
+              <label for="f-start">기간 시작</label>
+              <input id="f-start" type="date" required />
+            </div>
+            <div class="field">
+              <label for="f-end">기간 종료</label>
+              <input id="f-end" type="date" required />
+            </div>
+            <div class="field">
+              <label for="f-priority">우선순위</label>
+              <select id="f-priority">
+                <option value="상">상</option>
+                <option value="중" selected>중</option>
+                <option value="하">하</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f-hours">하루 목표 (예: 하루 몇 시간)</label>
+              <input id="f-hours" type="number" min="0.5" step="0.5" placeholder="예: 2" required />
+            </div>
+            <div class="field full">
+              <label for="f-success">성공 기준</label>
+              <textarea id="f-success" placeholder="예: 계획한 목표치 달성" required></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">저장</button>
+            <button type="button" id="cancel-edit" class="btn-ghost" hidden>수정 취소</button>
+            <span class="form-status" id="form-status"></span>
+          </div>
+        </form>
+      </section>
+
+      <h2 class="section-title">내 계획</h2>
+      <div class="plan-list" id="plan-list">
+        <div class="empty">불러오는 중…</div>
+      </div>
+    </div>
+
+    <!-- ===================== 탭: 실행 기록 (할 일) ===================== -->
+    <div class="tab-panel" id="tab-todo" hidden>
+      <section class="card">
+        <h2 id="todo-form-title">새 할 일 추가</h2>
+        <form id="todo-form">
+          <div class="form-grid">
+            <div class="field full">
+              <label for="t-plan">연결된 계획</label>
+              <select id="t-plan" required></select>
+            </div>
+            <div class="field full">
+              <label for="t-title">할 일 제목</label>
+              <input id="t-title" type="text" placeholder="예: 기출문제 3회분 풀기" required />
+            </div>
+            <div class="field">
+              <label for="t-due">마감일</label>
+              <input id="t-due" type="date" />
+            </div>
+            <div class="field">
+              <label for="t-priority">우선순위</label>
+              <select id="t-priority">
+                <option value="상">상</option>
+                <option value="중" selected>중</option>
+                <option value="하">하</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="t-tags">태그 (쉼표로 구분)</label>
+              <input id="t-tags" type="text" placeholder="예: 기출, 이론" />
+            </div>
+            <div class="field">
+              <label for="t-hours">예상 시간 (시간)</label>
+              <input id="t-hours" type="number" min="0.5" step="0.5" placeholder="예: 1.5" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">저장</button>
+            <button type="button" id="todo-cancel-edit" class="btn-ghost" hidden>수정 취소</button>
+            <span class="form-status" id="todo-form-status"></span>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>검색 · 거르기 · 정렬</h2>
         <div class="form-grid">
           <div class="field full">
-            <label for="f-title">계획 제목</label>
-            <input id="f-title" type="text" placeholder="예: ADSP 필기 준비" required />
+            <label for="q-search">제목 검색</label>
+            <input id="q-search" type="text" placeholder="제목에 포함된 단어" />
           </div>
           <div class="field">
-            <label for="f-start">기간 시작</label>
-            <input id="f-start" type="date" required />
+            <label for="q-status">상태</label>
+            <select id="q-status">
+              <option value="all">전체</option>
+              <option value="진행중">진행중</option>
+              <option value="완료">완료</option>
+            </select>
           </div>
           <div class="field">
-            <label for="f-end">기간 종료</label>
-            <input id="f-end" type="date" required />
-          </div>
-          <div class="field">
-            <label for="f-priority">우선순위</label>
-            <select id="f-priority">
+            <label for="q-priority">우선순위</label>
+            <select id="q-priority">
+              <option value="all">전체</option>
               <option value="상">상</option>
-              <option value="중" selected>중</option>
+              <option value="중">중</option>
               <option value="하">하</option>
             </select>
           </div>
           <div class="field">
-            <label for="f-hours">하루 목표 (예: 하루 몇 시간)</label>
-            <input id="f-hours" type="number" min="0.5" step="0.5" placeholder="예: 2" required />
+            <label for="q-plan">계획</label>
+            <select id="q-plan"><option value="all">전체</option></select>
           </div>
-          <div class="field full">
-            <label for="f-success">성공 기준</label>
-            <textarea id="f-success" placeholder="예: 계획한 목표치 달성" required></textarea>
+          <div class="field">
+            <label for="q-sort">정렬 기준</label>
+            <select id="q-sort">
+              <option value="due_asc">마감일 빠른 순</option>
+              <option value="priority_asc">우선순위 높은 순</option>
+              <option value="created_desc">최근 추가 순</option>
+            </select>
           </div>
         </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-primary">저장</button>
-          <button type="button" id="cancel-edit" class="btn-ghost" hidden>수정 취소</button>
-          <span class="form-status" id="form-status"></span>
-        </div>
-      </form>
-    </section>
+        <p class="sort-note" id="sort-note"></p>
+      </section>
 
-    <h2 class="section-title">내 계획</h2>
-    <div class="plan-list" id="plan-list">
-      <div class="empty">불러오는 중…</div>
+      <h2 class="section-title">할 일 목록</h2>
+      <div class="todo-list" id="todo-list">
+        <div class="empty">불러오는 중…</div>
+      </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
+  <script src="todo.js"></script>
   <script>
     document.getElementById("today-label").textContent =
       new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
+
+    // 탭 전환 (비활성 탭은 무시)
+    document.querySelectorAll(".tab[data-tab]").forEach((tabEl) => {
+      tabEl.addEventListener("click", () => {
+        if (tabEl.classList.contains("disabled")) return;
+        document.querySelectorAll(".tab[data-tab]").forEach((t) => t.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach((p) => (p.hidden = true));
+        tabEl.classList.add("active");
+        document.getElementById(`tab-${tabEl.dataset.tab}`).hidden = false;
+      });
+    });
   </script>
 </body>
 </html>

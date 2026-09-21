@@ -63,3 +63,42 @@ create policy "anon_select_plan_history" on plan_history
 drop policy if exists "anon_insert_plan_history" on plan_history;
 create policy "anon_insert_plan_history" on plan_history
   for insert to anon with check (true);
+
+-- ============================================================
+-- 카드 2 — 할 일 (todos)
+-- 계획(plans) 하나에 여러 할 일이 딸린다. 완료 여부는 되돌릴 수 있어야
+-- 하므로 별도 status 값으로 관리한다 (삭제/soft-delete 아님).
+-- 우선순위 텍스트('상'/'중'/'하')는 유니코드 코드포인트 순서가 우연히
+-- 상 < 중 < 하 이므로, priority 컬럼을 오름차순 정렬하면 그대로
+-- "높은 우선순위 먼저" 순서가 된다. (app.js 주석 참고)
+-- ============================================================
+create table if not exists todos (
+  id uuid primary key default gen_random_uuid(),
+  plan_id uuid not null references plans(id) on delete cascade,
+  title text not null,
+  due_date date,
+  priority text not null check (priority in ('상', '중', '하')),
+  tags text[] not null default '{}',
+  estimated_hours numeric,
+  status text not null default '진행중' check (status in ('진행중', '완료')),
+  completed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table todos enable row level security;
+
+grant select, insert, update, delete on public.todos to anon, authenticated;
+
+drop policy if exists "anon_select_todos" on todos;
+create policy "anon_select_todos" on todos
+  for select to anon using (true);
+drop policy if exists "anon_insert_todos" on todos;
+create policy "anon_insert_todos" on todos
+  for insert to anon with check (true);
+drop policy if exists "anon_update_todos" on todos;
+create policy "anon_update_todos" on todos
+  for update to anon using (true) with check (true);
+drop policy if exists "anon_delete_todos" on todos;
+create policy "anon_delete_todos" on todos
+  for delete to anon using (true);
