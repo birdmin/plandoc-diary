@@ -40,14 +40,26 @@ create table if not exists plan_history (
 alter table plans enable row level security;
 alter table plan_history enable row level security;
 
+-- "Automatically expose new tables"를 꺼둔 경우, RLS 정책과 별개로
+-- anon 역할에게 테이블 자체에 대한 GRANT가 없으면 Data API에서 전부 막힌다.
+-- 아래로 명시적으로 권한을 부여한다.
+grant usage on schema public to anon, authenticated;
+grant select, insert, update on public.plans to anon, authenticated;
+grant select, insert on public.plan_history to anon, authenticated;
+
+drop policy if exists "anon_select_plans" on plans;
 create policy "anon_select_plans" on plans
   for select to anon using (true);
+drop policy if exists "anon_insert_plans" on plans;
 create policy "anon_insert_plans" on plans
   for insert to anon with check (true);
+drop policy if exists "anon_update_plans" on plans;
 create policy "anon_update_plans" on plans
   for update to anon using (true) with check (true);
 
+drop policy if exists "anon_select_plan_history" on plan_history;
 create policy "anon_select_plan_history" on plan_history
   for select to anon using (true);
+drop policy if exists "anon_insert_plan_history" on plan_history;
 create policy "anon_insert_plan_history" on plan_history
   for insert to anon with check (true);
