@@ -4,7 +4,7 @@
 // - plan_history: 수정 "직전" 상태가 버전별로 계속 쌓이는 이력
 // ============================================================
 
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   window.SUPABASE_URL,
   window.SUPABASE_ANON_KEY
 );
@@ -70,7 +70,7 @@ function resetForm() {
 
 // ---------- 데이터 불러오기 ----------
 async function loadPlans() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("plans")
     .select("*")
     .order("created_at", { ascending: false });
@@ -92,7 +92,7 @@ async function loadPlans() {
 
   // 버전 개수 배지 채우기 (비동기 head count)
   data.forEach(async (p) => {
-    const { count } = await supabase
+    const { count } = await supabaseClient
       .from("plan_history")
       .select("history_id", { count: "exact", head: true })
       .eq("plan_id", p.id);
@@ -147,7 +147,7 @@ window.toggleHistory = async function (planId) {
   panel.innerHTML = `<div class="form-status">불러오는 중…</div>`;
   panel.classList.add("open");
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("plan_history")
     .select("*")
     .eq("plan_id", planId)
@@ -225,20 +225,20 @@ form.addEventListener("submit", async (e) => {
 async function createPlan(values) {
   // plans 테이블에 최초 상태로 생성. 이 시점 값은 plans 자체가 최초 기록이므로
   // plan_history에는 아직 넣지 않는다 (이력은 "수정이 일어날 때" 쌓인다).
-  const { error } = await supabase.from("plans").insert(values);
+  const { error } = await supabaseClient.from("plans").insert(values);
   if (error) throw error;
 }
 
 async function updatePlanWithHistory(planId, newValues) {
   // 1) 수정 "직전" 값을 이력에 먼저 쌓는다 (plan_id는 그대로, version_no만 증가)
   const before = planCache[planId];
-  const { count } = await supabase
+  const { count } = await supabaseClient
     .from("plan_history")
     .select("history_id", { count: "exact", head: true })
     .eq("plan_id", planId);
   const nextVersion = (count ?? 0) + 1;
 
-  const { error: histErr } = await supabase.from("plan_history").insert({
+  const { error: histErr } = await supabaseClient.from("plan_history").insert({
     plan_id: planId,
     version_no: nextVersion,
     title: before.title,
@@ -251,7 +251,7 @@ async function updatePlanWithHistory(planId, newValues) {
   if (histErr) throw histErr;
 
   // 2) plans 테이블은 새 값으로 갱신 (id는 바뀌지 않는다)
-  const { error: updErr } = await supabase
+  const { error: updErr } = await supabaseClient
     .from("plans")
     .update({ ...newValues, updated_at: new Date().toISOString() })
     .eq("id", planId);
