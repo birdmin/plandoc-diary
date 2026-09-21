@@ -94,6 +94,10 @@ function renderReviewCard(plan, todos, today) {
           <button class="stat-value" onclick="toggleDetail('${plan.id}','done')">${completed.length}</button>
         </div>
         <div class="stat-box">
+          <div class="stat-label">완료율</div>
+          <button class="stat-value" onclick="toggleDetail('${plan.id}','done')">${totalTodos.length ? Math.round((completed.length / totalTodos.length) * 100) : 0}%</button>
+        </div>
+        <div class="stat-box">
           <div class="stat-label">지연 수</div>
           <button class="stat-value" onclick="toggleDetail('${plan.id}','overdue')">${overdue.length}</button>
         </div>
