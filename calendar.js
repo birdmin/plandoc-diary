@@ -76,16 +76,20 @@ async function renderCalendar() {
     .map((cell) => {
       const dateStr = ymd(cell.date);
       const matched = (plans || []).filter((p) => dateStr >= p.period_start && dateStr <= p.period_end);
-      const pills = matched
+      const MAX_VISIBLE = 3;
+      const visible = matched.slice(0, MAX_VISIBLE);
+      const pills = visible
         .map(
           (p) =>
             `<button class="cal-pill priority-${p.priority}" onclick="showCalPlan('${p.id}')" title="${escapeHtmlC(p.title)}">${escapeHtmlC(p.title)}</button>`
         )
         .join("");
+      const moreHtml =
+        matched.length > MAX_VISIBLE ? `<div class="cal-more">+${matched.length - MAX_VISIBLE}개 더</div>` : "";
       const classes = ["cal-day"];
       if (cell.outside) classes.push("outside");
       if (dateStr === todaySeoul) classes.push("today");
-      return `<div class="${classes.join(" ")}"><div class="cal-daynum">${cell.date.getDate()}</div>${pills}</div>`;
+      return `<div class="${classes.join(" ")}"><div class="cal-daynum">${cell.date.getDate()}</div>${pills}${moreHtml}</div>`;
     })
     .join("");
 

@@ -481,6 +481,7 @@ button {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(84px, auto);
   gap: 4px;
 }
 
@@ -501,6 +502,13 @@ button {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  overflow: hidden;
+}
+
+.cal-more {
+  font-size: 0.65rem;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
 }
 .cal-day.outside { opacity: 0.35; }
 .cal-day.today { border-color: var(--accent); border-width: 2px; }
