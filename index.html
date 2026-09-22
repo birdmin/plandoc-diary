@@ -13,7 +13,10 @@
   <div class="wrap">
     <header class="app-header">
       <h1>플랜두씨 다이어리</h1>
-      <span class="today" id="today-label"></span>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span class="today" id="today-label"></span>
+        <button class="btn-ghost btn-small" id="export-btn">전체 자료 내보내기 (JSON)</button>
+      </div>
     </header>
 
     <nav class="tabs">
@@ -24,9 +27,9 @@
     </nav>
 
     <div class="notice">
-      <strong>아직 로그인이 없습니다.</strong> 이 링크를 아는 사람은 누구나 이 화면을 보고,
-      계획·할 일을 추가·수정할 수 있습니다. 그래서 여기에는 남이 봐도 괜찮은 내용만 넣어주세요.
-      로그인으로 잠그는 작업은 아직 구현되지 않았습니다.
+      <strong>지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요.</strong>
+      계획·할 일을 추가·수정하는 것도 마찬가지로 누구나 할 수 있습니다.
+      로그인으로 잠그는 작업은 아직 구현되지 않았습니다 (다음 과제에서 진행 예정).
     </div>
 
     <!-- ===================== 탭: 계획 ===================== -->
@@ -205,6 +208,7 @@
   <script src="todo.js"></script>
   <script src="log.js"></script>
   <script src="review.js"></script>
+  <script src="export.js"></script>
   <script>
     document.getElementById("today-label").textContent =
       new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });

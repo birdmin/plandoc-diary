@@ -1,0 +1,117 @@
+{
+  "schema_version": "v2",
+  "app": "플랜두씨 다이어리 (과제 6)",
+  "database": "Supabase Postgres (public schema)",
+  "date_time_rules": {
+    "timestamptz_columns": {
+      "storage": "UTC로 저장 (Postgres timestamptz 내부 규칙)",
+      "display": "화면에는 Asia/Seoul 기준으로 변환해서 보여준다 (예: new Date(...).toLocaleString('ko-KR'), 또는 seoulTodayStr()에서 timeZone:'Asia/Seoul' 명시)",
+      "affected_columns": [
+        "plans.created_at", "plans.updated_at",
+        "plan_history.recorded_at",
+        "todos.created_at", "todos.updated_at", "todos.completed_at",
+        "execution_logs.started_at", "execution_logs.ended_at", "execution_logs.created_at",
+        "plan_reviews.created_at"
+      ]
+    },
+    "date_columns": {
+      "storage": "시간대 없는 달력 날짜(DATE)로 저장. 입력한 그대로의 연-월-일이며 시간대 변환을 하지 않는다.",
+      "affected_columns": ["plans.period_start", "plans.period_end", "todos.due_date"]
+    },
+    "today_definition": "카드 4 '지연' 판정에서 오늘은 Asia/Seoul 캘린더 기준 오늘(YYYY-MM-DD)이며, 브라우저 로캘에 의존하지 않고 Intl(timeZone:'Asia/Seoul')로 명시적으로 계산한다."
+  },
+  "units": {
+    "estimated_hours": "시간(hour) 단위, 소수 허용 (plans.estimated_hours, todos.estimated_hours)",
+    "actual_minutes": "분(minute) 단위 (execution_logs.actual_minutes). 돌아보기 집계에서 시간 단위로 환산할 때는 actual_minutes / 60 을 사용해 estimated_hours와 단위를 맞춘다."
+  },
+  "tables": [
+    {
+      "name": "plans",
+      "purpose": "카드1: 계획 (항상 '현재 최신 상태'만 담음, 수정 이력은 plan_history로 분리)",
+      "columns": [
+        { "name": "id", "type": "uuid", "pk": true },
+        { "name": "title", "type": "text", "nullable": false },
+        { "name": "period_start", "type": "date", "nullable": false },
+        { "name": "period_end", "type": "date", "nullable": false },
+        { "name": "priority", "type": "text", "nullable": false, "check": "in ('상','중','하')" },
+        { "name": "success_criteria", "type": "text", "nullable": false },
+        { "name": "estimated_hours", "type": "numeric", "nullable": false, "check": "> 0" },
+        { "name": "carried_note", "type": "text", "nullable": true, "note": "카드4 돌아보기에서 넘어온 '고칠 점 한 줄'" },
+        { "name": "created_at", "type": "timestamptz", "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "default": "now()" }
+      ]
+    },
+    {
+      "name": "plan_history",
+      "purpose": "카드1: 계획 수정 '직전' 값이 버전 번호와 함께 계속 쌓이는 이력. plan_id는 절대 안 바뀌고 version_no만 증가한다.",
+      "columns": [
+        { "name": "history_id", "type": "uuid", "pk": true },
+        { "name": "plan_id", "type": "uuid", "fk": "plans.id", "on_delete": "cascade" },
+        { "name": "version_no", "type": "int", "nullable": false },
+        { "name": "title", "type": "text" },
+        { "name": "period_start", "type": "date" },
+        { "name": "period_end", "type": "date" },
+        { "name": "priority", "type": "text" },
+        { "name": "success_criteria", "type": "text" },
+        { "name": "estimated_hours", "type": "numeric" },
+        { "name": "recorded_at", "type": "timestamptz", "default": "now()" }
+      ],
+      "unique": ["plan_id", "version_no"]
+    },
+    {
+      "name": "todos",
+      "purpose": "카드2: 계획에 딸린 할 일. 완료/되돌리기는 status 값만 바꾸는 것이며 삭제와는 별개.",
+      "columns": [
+        { "name": "id", "type": "uuid", "pk": true },
+        { "name": "plan_id", "type": "uuid", "fk": "plans.id", "on_delete": "cascade" },
+        { "name": "title", "type": "text", "nullable": false, "ui_label": "할 일 내용" },
+        { "name": "due_date", "type": "date", "nullable": true },
+        { "name": "priority", "type": "text", "nullable": false, "check": "in ('상','중','하')" },
+        { "name": "tags", "type": "text[]", "default": "'{}'", "ui_label": "기타" },
+        { "name": "estimated_hours", "type": "numeric", "nullable": true },
+        { "name": "status", "type": "text", "default": "'진행중'", "check": "in ('진행중','완료')" },
+        { "name": "completed_at", "type": "timestamptz", "nullable": true },
+        { "name": "created_at", "type": "timestamptz", "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "default": "now()" }
+      ]
+    },
+    {
+      "name": "execution_logs",
+      "purpose": "카드3: 실제로 한 일 기록. plans 값을 전혀 참조/수정하지 않는다. 완료 처리 중복 방지를 위해 idempotency_key에 unique 제약을 건다.",
+      "columns": [
+        { "name": "id", "type": "uuid", "pk": true },
+        { "name": "todo_id", "type": "uuid", "fk": "todos.id", "on_delete": "cascade" },
+        { "name": "started_at", "type": "timestamptz", "nullable": false },
+        { "name": "ended_at", "type": "timestamptz", "nullable": false },
+        { "name": "actual_minutes", "type": "numeric", "nullable": false, "check": ">= 0" },
+        { "name": "blocker_reason", "type": "text", "nullable": true },
+        { "name": "idempotency_key", "type": "uuid", "nullable": false, "unique": true,
+          "note": "완료 폼을 여는 순간 클라이언트에서 1회 생성해 고정. 같은 키로 두 번 insert 시도 시 두 번째는 DB unique 제약(23505)으로 거절되어 완료 기록이 중복되지 않는다." },
+        { "name": "created_at", "type": "timestamptz", "default": "now()" }
+      ],
+      "check": ["ended_at >= started_at"]
+    },
+    {
+      "name": "plan_reviews",
+      "purpose": "카드4: 돌아보기에서 정한 '고칠 점 한 줄'. carried_to_plan_id가 null이면 아직 다음 계획에 안 붙은 대기 상태.",
+      "columns": [
+        { "name": "id", "type": "uuid", "pk": true },
+        { "name": "plan_id", "type": "uuid", "fk": "plans.id", "on_delete": "cascade", "note": "이 메모가 작성된 계획(어느 돌아보기에서 나온 메모인지)" },
+        { "name": "improvement_note", "type": "text", "nullable": false },
+        { "name": "carried_to_plan_id", "type": "uuid", "fk": "plans.id", "nullable": true, "note": "이 메모가 실제로 붙은 새 계획" },
+        { "name": "created_at", "type": "timestamptz", "default": "now()" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "from": "plan_history.plan_id", "to": "plans.id", "type": "many-to-one" },
+    { "from": "todos.plan_id", "to": "plans.id", "type": "many-to-one" },
+    { "from": "execution_logs.todo_id", "to": "todos.id", "type": "many-to-one" },
+    { "from": "plan_reviews.plan_id", "to": "plans.id", "type": "many-to-one", "note": "메모가 태어난 계획" },
+    { "from": "plan_reviews.carried_to_plan_id", "to": "plans.id", "type": "many-to-one (nullable)", "note": "메모가 이어붙은 다음 계획" }
+  ],
+  "access_control": {
+    "current_stage": "과제 6 — 로그인 없음. anon 역할에 select/insert/update(/delete: todos만) 전부 허용.",
+    "next_stage": "과제 7에서 auth.uid() 기준으로 RLS 정책을 좁혀 잠금 예정."
+  }
+}
