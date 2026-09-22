@@ -58,7 +58,15 @@ function fillForm(plan) {
   el("f-priority").value = plan.priority;
   el("f-success").value = plan.success_criteria;
   el("f-hours").value = plan.estimated_hours;
+  syncEndDateMin();
 }
+
+// 종료일 입력창에서 시작일보다 앞선 날짜를 애초에 고를 수 없게 min을 맞춘다
+function syncEndDateMin() {
+  const start = el("f-start").value;
+  if (start) el("f-end").min = start;
+}
+el("f-start").addEventListener("change", syncEndDateMin);
 
 function resetForm() {
   form.reset();

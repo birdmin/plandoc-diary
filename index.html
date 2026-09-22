@@ -16,6 +16,7 @@
       <div style="display:flex; align-items:center; gap:12px;">
         <span class="today" id="today-label"></span>
         <button class="btn-ghost btn-small" id="export-btn">전체 자료 내보내기 (JSON)</button>
+        <button class="btn-ghost btn-small" id="export-txt-btn">표로 보기 (TXT)</button>
       </div>
     </header>
 
@@ -24,6 +25,7 @@
       <div class="tab" data-tab="todo">세부 계획</div>
       <div class="tab" data-tab="log">실행 기록</div>
       <div class="tab" data-tab="review">돌아보기</div>
+      <div class="tab" data-tab="calendar">캘린더</div>
     </nav>
 
     <div class="notice">
@@ -98,6 +100,7 @@
             <div class="field">
               <label for="t-due">마감일</label>
               <input id="t-due" type="date" />
+              <span class="field-hint" id="t-due-hint"></span>
             </div>
             <div class="field">
               <label for="t-priority">우선순위</label>
@@ -200,6 +203,19 @@
         <div class="empty">불러오는 중…</div>
       </div>
     </div>
+
+    <!-- ===================== 탭: 캘린더 ===================== -->
+    <div class="tab-panel" id="tab-calendar" hidden>
+      <div class="card">
+        <div class="calendar-head">
+          <button class="btn-ghost btn-small" id="cal-prev">◀ 이전 달</button>
+          <span class="calendar-title" id="cal-title"></span>
+          <button class="btn-ghost btn-small" id="cal-next">다음 달 ▶</button>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+      <div id="cal-detail"></div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -209,6 +225,7 @@
   <script src="log.js"></script>
   <script src="review.js"></script>
   <script src="export.js"></script>
+  <script src="calendar.js"></script>
   <script>
     document.getElementById("today-label").textContent =
       new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
@@ -219,6 +236,7 @@
       todo: () => loadTodos(),
       log: () => { loadPendingTodos(); loadDoneTodos(); refreshLogCount(); },
       review: () => loadReview(),
+      calendar: () => renderCalendar(),
     };
     document.querySelectorAll(".tab[data-tab]").forEach((tabEl) => {
       tabEl.addEventListener("click", () => {

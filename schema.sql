@@ -168,6 +168,40 @@ create policy "anon_update_plan_reviews" on plan_reviews
   for update to anon using (true) with check (true);
 
 -- ============================================================
+-- 보강 — 계획 기간·할 일 마감일 유효성
+-- 1) 계획의 종료일은 시작일보다 앞설 수 없다 (DB 제약, 클라이언트 우회 불가)
+-- 2) 할 일의 마감일은 그 할 일이 딸린 계획의 기간 안에서만 정할 수 있다
+--    (다른 표를 참조해야 해서 check 제약이 아니라 트리거로 구현한다)
+-- ============================================================
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'plans_period_valid') then
+    alter table plans add constraint plans_period_valid check (period_end >= period_start);
+  end if;
+end $$;
+
+create or replace function check_todo_due_within_plan()
+returns trigger as $$
+declare
+  p_start date;
+  p_end date;
+begin
+  if new.due_date is null then
+    return new;
+  end if;
+  select period_start, period_end into p_start, p_end from plans where id = new.plan_id;
+  if new.due_date < p_start or new.due_date > p_end then
+    raise exception '마감일(%)은 계획 기간(% ~ %) 안에 있어야 합니다', new.due_date, p_start, p_end;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists trg_check_todo_due on todos;
+create trigger trg_check_todo_due
+before insert or update on todos
+for each row execute function check_todo_due_within_plan();
+
+-- ============================================================
 -- 카드 4 — 돌아보기 (reviews) + 계획에 "넘어온 메모" 컬럼
 -- reviews.note 한 건이 다음에 만드는 계획의 plans.carried_note로
 -- 복사되어 들어간다. 그래야 "다음 계획으로 넘어간다"는 게 화면 문구가

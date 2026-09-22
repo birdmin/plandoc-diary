@@ -183,6 +183,12 @@ a { color: var(--accent); }
 
 .field textarea { resize: vertical; min-height: 56px; }
 
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+}
+
 .form-actions {
   margin-top: 16px;
   display: flex;
@@ -458,6 +464,73 @@ button {
 }
 
 .tab-panel[hidden] { display: none; }
+
+/* ---------- 캘린더 ---------- */
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.calendar-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-dow {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  padding-bottom: 6px;
+  font-family: var(--font-mono);
+}
+
+.cal-day {
+  min-height: 84px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.cal-day.outside { opacity: 0.35; }
+.cal-day.today { border-color: var(--accent); border-width: 2px; }
+
+.cal-daynum {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.cal-pill {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 100px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+  text-align: left;
+  width: 100%;
+}
+.cal-pill.priority-상 { background: var(--priority-high-bg); color: var(--priority-high); }
+.cal-pill.priority-중 { background: var(--priority-mid-bg); color: var(--priority-mid); }
+.cal-pill.priority-하 { background: var(--priority-low-bg); color: var(--priority-low); }
+
+@media (max-width: 640px) {
+  .cal-day { min-height: 56px; }
+  .cal-dow { font-size: 0.65rem; }
+}
 
 /* ---------- 정렬 안내 ---------- */
 .sort-note {

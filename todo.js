@@ -39,10 +39,33 @@ function populatePlanSelects() {
 
   if (ids.includes(keepPlan)) planSelect.value = keepPlan;
   if (keepFilter === "all" || ids.includes(keepFilter)) planFilterSelect.value = keepFilter;
+  syncDueDateBounds();
 }
 
 window.addEventListener("plans-updated", populatePlanSelects);
 populatePlanSelects(); // 페이지 로드 시 이미 있는 값으로 1차 채움
+
+// 마감일 입력창을 선택된 계획의 기간(period_start~period_end) 안으로 제한한다.
+// (DB 트리거로도 막혀 있지만, 애초에 화면에서 못 고르게 해서 사용성을 높인다.)
+function syncDueDateBounds() {
+  const dueInput = tEl("t-due");
+  const hintEl = tEl("t-due-hint");
+  const plan = (window.planCache || {})[planSelect.value];
+  if (!plan) {
+    dueInput.removeAttribute("min");
+    dueInput.removeAttribute("max");
+    if (hintEl) hintEl.textContent = "";
+    return;
+  }
+  dueInput.min = plan.period_start;
+  dueInput.max = plan.period_end;
+  if (hintEl) hintEl.textContent = `이 계획 기간(${plan.period_start} ~ ${plan.period_end}) 안에서만 고를 수 있습니다.`;
+  // 이미 골라둔 마감일이 범위를 벗어나면 비워서 잘못된 값이 남지 않게 한다
+  if (dueInput.value && (dueInput.value < plan.period_start || dueInput.value > plan.period_end)) {
+    dueInput.value = "";
+  }
+}
+planSelect.addEventListener("change", syncDueDateBounds);
 
 function escapeHtmlT(s) {
   const div = document.createElement("div");
@@ -83,6 +106,7 @@ function fillTodoForm(todo) {
   tEl("t-priority").value = todo.priority;
   tEl("t-tags").value = (todo.tags || []).join(", ");
   tEl("t-hours").value = todo.estimated_hours ?? "";
+  syncDueDateBounds();
 }
 
 function resetTodoForm() {

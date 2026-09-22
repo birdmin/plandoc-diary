@@ -1,0 +1,146 @@
+{
+  "exported_at": "2026-09-22T00:27:54.486Z",
+  "timezone_note": "모든 timestamptz 값은 UTC로 저장됩니다. date 값(기간/마감일)은 시간대 없이 달력 날짜 그대로입니다.",
+  "plans": [
+    {
+      "id": "ecad5b99-1cbd-4eb0-8a2e-98a9c25b4829",
+      "title": "adsp 준비",
+      "period_start": "2026-09-22",
+      "period_end": "2026-10-30",
+      "priority": "중",
+      "success_criteria": "하루 적어도 문제집 한 단락 공부하기",
+      "estimated_hours": 1,
+      "created_at": "2026-09-22T00:21:40.715697+00:00",
+      "updated_at": "2026-09-22T00:21:40.715697+00:00",
+      "carried_note": null
+    },
+    {
+      "id": "fcc29382-d130-4033-b269-1c134e8ba1d6",
+      "title": "네트워크 복습",
+      "period_start": "2026-09-22",
+      "period_end": "2026-11-12",
+      "priority": "하",
+      "success_criteria": "당일 나간 진도에 해당하는 내용 복습하기",
+      "estimated_hours": 1,
+      "created_at": "2026-09-22T00:22:22.068477+00:00",
+      "updated_at": "2026-09-22T00:22:35.685+00:00",
+      "carried_note": null
+    },
+    {
+      "id": "446ed734-9b2b-4979-b8c5-80f31387098e",
+      "title": "인프라 보안 공부",
+      "period_start": "2026-09-22",
+      "period_end": "2026-09-26",
+      "priority": "하",
+      "success_criteria": "하루 한 페이지라도 공부하기",
+      "estimated_hours": 2,
+      "created_at": "2026-09-22T00:27:41.628517+00:00",
+      "updated_at": "2026-09-22T00:27:41.628517+00:00",
+      "carried_note": "다음에는 예상 시간을 조금 더 넉넉히 잡기."
+    }
+  ],
+  "plan_history": [
+    {
+      "history_id": "714bb766-9f1a-4ee8-8a4a-b7328ad447af",
+      "plan_id": "fcc29382-d130-4033-b269-1c134e8ba1d6",
+      "version_no": 1,
+      "title": "네트워크 복습",
+      "period_start": "2026-09-22",
+      "period_end": "2026-11-12",
+      "priority": "상",
+      "success_criteria": "당일 나간 진도에 해당하는 내용 복습하기",
+      "estimated_hours": 1,
+      "recorded_at": "2026-09-22T00:22:34.883395+00:00"
+    }
+  ],
+  "todos": [
+    {
+      "id": "d2edc551-ce9c-471d-afb1-e572a6de903f",
+      "plan_id": "ecad5b99-1cbd-4eb0-8a2e-98a9c25b4829",
+      "title": "문제집 ~ 15page까지 진도 나가기",
+      "due_date": "2026-09-22",
+      "priority": "하",
+      "tags": [],
+      "estimated_hours": 1,
+      "status": "완료",
+      "completed_at": "2026-09-22T00:26:16.387+00:00",
+      "created_at": "2026-09-22T00:23:22.654571+00:00",
+      "updated_at": "2026-09-22T00:23:22.654571+00:00"
+    },
+    {
+      "id": "ca8f9a0a-46cd-4175-953d-55de49518012",
+      "plan_id": "fcc29382-d130-4033-b269-1c134e8ba1d6",
+      "title": "모의침투의 이해 pdf 복습하기",
+      "due_date": "2026-09-23",
+      "priority": "중",
+      "tags": [],
+      "estimated_hours": 1,
+      "status": "완료",
+      "completed_at": "2026-09-22T00:26:17.603+00:00",
+      "created_at": "2026-09-22T00:23:47.665974+00:00",
+      "updated_at": "2026-09-22T00:23:47.665974+00:00"
+    },
+    {
+      "id": "ffe4cca1-ab2f-47fe-ab72-962c38cc9228",
+      "plan_id": "ecad5b99-1cbd-4eb0-8a2e-98a9c25b4829",
+      "title": "문제집 ~30 page까지 진도 나가기",
+      "due_date": "2026-09-23",
+      "priority": "중",
+      "tags": [],
+      "estimated_hours": null,
+      "status": "완료",
+      "completed_at": "2026-09-22T00:26:27.587+00:00",
+      "created_at": "2026-09-22T00:24:14.500121+00:00",
+      "updated_at": "2026-09-22T00:24:14.500121+00:00"
+    },
+    {
+      "id": "e4fa6871-782a-4d99-ae40-f3cfbabe13f5",
+      "plan_id": "ecad5b99-1cbd-4eb0-8a2e-98a9c25b4829",
+      "title": "기출 1회 풀어보기",
+      "due_date": "2026-09-26",
+      "priority": "상",
+      "tags": [],
+      "estimated_hours": 1.5,
+      "status": "완료",
+      "completed_at": "2026-09-22T00:26:19.827+00:00",
+      "created_at": "2026-09-22T00:24:37.223258+00:00",
+      "updated_at": "2026-09-22T00:24:37.223258+00:00"
+    },
+    {
+      "id": "40a465c7-a269-4cd9-a4cf-817b771374d1",
+      "plan_id": "ecad5b99-1cbd-4eb0-8a2e-98a9c25b4829",
+      "title": "기출 2회 풀어보기",
+      "due_date": "2026-09-26",
+      "priority": "중",
+      "tags": [],
+      "estimated_hours": 1.5,
+      "status": "진행중",
+      "completed_at": null,
+      "created_at": "2026-09-22T00:24:54.919131+00:00",
+      "updated_at": "2026-09-22T00:24:54.919131+00:00"
+    },
+    {
+      "id": "d41955ee-baf7-473a-95fc-792f187e2776",
+      "plan_id": "ecad5b99-1cbd-4eb0-8a2e-98a9c25b4829",
+      "title": "기출 오답하기",
+      "due_date": "2026-09-27",
+      "priority": "하",
+      "tags": [],
+      "estimated_hours": 2,
+      "status": "진행중",
+      "completed_at": null,
+      "created_at": "2026-09-22T00:25:06.556752+00:00",
+      "updated_at": "2026-09-22T00:25:06.556752+00:00"
+    }
+  ],
+  "execution_logs": [],
+  "plan_reviews": [
+    {
+      "id": "ecde8ed0-54db-4294-bb4d-e2a7094ee379",
+      "plan_id": "fcc29382-d130-4033-b269-1c134e8ba1d6",
+      "improvement_note": "다음에는 예상 시간을 조금 더 넉넉히 잡기.",
+      "carried_to_plan_id": "446ed734-9b2b-4979-b8c5-80f31387098e",
+      "created_at": "2026-09-22T00:26:51.364275+00:00"
+    }
+  ]
+}
