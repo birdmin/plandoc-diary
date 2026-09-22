@@ -481,7 +481,7 @@ button {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: minmax(84px, auto);
+  grid-auto-rows: 108px;
   gap: 4px;
 }
 
@@ -494,7 +494,7 @@ button {
 }
 
 .cal-day {
-  min-height: 84px;
+  height: 108px;
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 6px;
@@ -509,6 +509,15 @@ button {
   font-size: 0.65rem;
   color: var(--ink-soft);
   font-family: var(--font-mono);
+}
+
+/* 캘린더에서 계획 탭으로 이동했을 때 해당 카드 강조 */
+.flash-highlight {
+  animation: flash-bg 1.6s ease-out;
+}
+@keyframes flash-bg {
+  0% { background: var(--accent-soft); box-shadow: 0 0 0 3px var(--accent); }
+  100% { background: var(--card); box-shadow: none; }
 }
 .cal-day.outside { opacity: 0.35; }
 .cal-day.today { border-color: var(--accent); border-width: 2px; }
@@ -536,7 +545,8 @@ button {
 .cal-pill.priority-하 { background: var(--priority-low-bg); color: var(--priority-low); }
 
 @media (max-width: 640px) {
-  .cal-day { min-height: 56px; }
+  .cal-day { height: 72px; }
+  .calendar-grid { grid-auto-rows: 72px; }
   .cal-dow { font-size: 0.65rem; }
 }
 

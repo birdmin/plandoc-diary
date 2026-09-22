@@ -81,7 +81,7 @@ async function renderCalendar() {
       const pills = visible
         .map(
           (p) =>
-            `<button class="cal-pill priority-${p.priority}" onclick="showCalPlan('${p.id}')" title="${escapeHtmlC(p.title)}">${escapeHtmlC(p.title)}</button>`
+            `<button class="cal-pill priority-${p.priority}" onclick="goToPlan('${p.id}')" title="${escapeHtmlC(p.title)} (클릭하면 계획 탭으로 이동)">${escapeHtmlC(p.title)}</button>`
         )
         .join("");
       const moreHtml =
@@ -97,19 +97,22 @@ async function renderCalendar() {
   window.__calPlans = plans || [];
 }
 
-window.showCalPlan = function (planId) {
-  const p = (window.__calPlans || []).find((x) => x.id === planId);
-  if (!p) return;
-  calDetail.innerHTML = `
-    <div class="card" style="margin-top:14px;">
-      <h2>${escapeHtmlC(p.title)}</h2>
-      <div class="plan-meta">${p.period_start} ~ ${p.period_end} · 우선순위 ${p.priority}</div>
-      <dl class="plan-detail">
-        <dt>성공 기준</dt><dd>${escapeHtmlC(p.success_criteria)}</dd>
-        <dt>하루 목표</dt><dd>${p.estimated_hours}시간 / 일</dd>
-      </dl>
-    </div>
-  `;
+// 계획 알약을 클릭하면 "계획" 탭으로 이동해서 해당 계획 카드를 스크롤 + 강조한다.
+window.goToPlan = function (planId) {
+  const planTab = document.querySelector('.tab[data-tab="plan"]');
+  if (!planTab) return;
+
+  const highlightWhenReady = () => {
+    const cardEl = document.querySelector(`[data-plan-id="${planId}"]`);
+    if (!cardEl) return;
+    cardEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    cardEl.classList.add("flash-highlight");
+    setTimeout(() => cardEl.classList.remove("flash-highlight"), 1600);
+  };
+
+  // loadPlans()가 끝나면 plans-updated 이벤트가 한 번 뜬다. 그때 스크롤+강조한다.
+  window.addEventListener("plans-updated", highlightWhenReady, { once: true });
+  planTab.click(); // 탭 전환 + 그 안에서 loadPlans() 자동 호출됨
 };
 
 renderCalendar();
