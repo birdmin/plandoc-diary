@@ -85,17 +85,46 @@ async function renderCalendar() {
         )
         .join("");
       const moreHtml =
-        matched.length > MAX_VISIBLE ? `<div class="cal-more">+${matched.length - MAX_VISIBLE}개 더</div>` : "";
+        matched.length > MAX_VISIBLE
+          ? `<button class="cal-more" onclick="showDayPlans('${dateStr}')">▾ ${matched.length - MAX_VISIBLE}개 더</button>`
+          : "";
       const classes = ["cal-day"];
       if (cell.outside) classes.push("outside");
       if (dateStr === todaySeoul) classes.push("today");
-      return `<div class="${classes.join(" ")}"><div class="cal-daynum">${cell.date.getDate()}</div>${pills}${moreHtml}</div>`;
+      return `<div class="${classes.join(" ")}"><button class="cal-daynum" onclick="showDayPlans('${dateStr}')">${cell.date.getDate()}</button>${pills}${moreHtml}</div>`;
     })
     .join("");
 
   calGrid.innerHTML = dowHtml + cellsHtml;
   window.__calPlans = plans || [];
 }
+
+// 날짜(또는 "N개 더")를 누르면 그 날짜의 계획 전체를 캘린더 아래에 목록으로 펼친다.
+window.showDayPlans = function (dateStr) {
+  const matched = (window.__calPlans || []).filter((p) => dateStr >= p.period_start && dateStr <= p.period_end);
+  if (!matched.length) {
+    calDetail.innerHTML = "";
+    return;
+  }
+  const rows = matched
+    .map(
+      (p) => `
+      <div class="plan-row priority-${p.priority}" style="cursor:pointer;" onclick="goToPlan('${p.id}')">
+        <div class="plan-top">
+          <div>
+            <span class="plan-title">${escapeHtmlC(p.title)}</span>
+            <span class="badge priority-${p.priority}">${p.priority}</span>
+          </div>
+          <div class="plan-meta">${p.period_start} ~ ${p.period_end}</div>
+        </div>
+      </div>`
+    )
+    .join("");
+  calDetail.innerHTML = `
+    <h2 class="section-title">${dateStr}의 계획 (${matched.length}개) — 눌러서 이동</h2>
+    <div class="plan-list">${rows}</div>
+  `;
+};
 
 // 계획 알약을 클릭하면 "계획" 탭으로 이동해서 해당 계획 카드를 스크롤 + 강조한다.
 window.goToPlan = function (planId) {
