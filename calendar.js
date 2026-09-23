@@ -76,8 +76,10 @@ async function renderCalendar() {
     .map((cell) => {
       const dateStr = ymd(cell.date);
       const matched = (plans || []).filter((p) => dateStr >= p.period_start && dateStr <= p.period_end);
-      const MAX_VISIBLE = 3;
-      const visible = matched.slice(0, MAX_VISIBLE);
+      // 3개까지는 그대로 다 보여주고, 4개 이상이면 2개만 보여주고 나머지는 "N개 더"로 묶는다.
+      const visibleCount = matched.length <= 3 ? matched.length : 2;
+      const visible = matched.slice(0, visibleCount);
+      const moreCount = matched.length - visibleCount;
       const pills = visible
         .map(
           (p) =>
@@ -85,8 +87,8 @@ async function renderCalendar() {
         )
         .join("");
       const moreHtml =
-        matched.length > MAX_VISIBLE
-          ? `<button class="cal-more" onclick="showDayPlans('${dateStr}')">▾ ${matched.length - MAX_VISIBLE}개 더</button>`
+        moreCount > 0
+          ? `<button class="cal-more" onclick="showDayPlans('${dateStr}')">▾ ${moreCount}개 더</button>`
           : "";
       const classes = ["cal-day"];
       if (cell.outside) classes.push("outside");

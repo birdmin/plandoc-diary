@@ -91,14 +91,15 @@ async function loadPlans() {
   planCache = {};
   data.forEach((p) => (planCache[p.id] = p));
   window.planCache = planCache; // todo.js 등 다른 스크립트에서 계획 목록 참조용
-  window.dispatchEvent(new CustomEvent("plans-updated"));
 
   if (data.length === 0) {
     listEl.innerHTML = `<div class="empty">아직 계획이 없습니다. 위 폼에서 지금 실제로 하고 있는 일을 추가해보세요.</div>`;
+    window.dispatchEvent(new CustomEvent("plans-updated"));
     return;
   }
 
   listEl.innerHTML = data.map(renderPlanRow).join("");
+  window.dispatchEvent(new CustomEvent("plans-updated")); // 화면에 실제로 그린 "다음"에 신호를 보낸다
 
   // 버전 개수 배지 채우기 (비동기 head count)
   data.forEach(async (p) => {
